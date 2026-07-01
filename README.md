@@ -83,13 +83,33 @@ Telcor AI Assistant is a CLI agent built with the Vercel AI SDK. It provides an 
 
 ## Usage
 
-To start the assistant, run the following command:
+To start the assistant, run the following command in your terminal:
 
 ```bash
 npm start
 ```
 
-You can type your prompts directly in the CLI. The assistant will propose README content based on your inputs. After generating a proposal, you can choose to save it.
+Once the assistant is running, you can interact with it directly in the CLI. Here’s what you can do:
+
+1. **Type your prompt**: The assistant will respond with a proposed README content based on your input.
+   
+   For example:
+   ```plaintext
+   you> Generate a README for a project that manages tasks.
+   ```
+
+2. **Review the proposal**: After processing your input, the assistant will display the proposed content.
+
+3. **Saving the proposal**: If you are satisfied with the proposed README, the assistant will ask you to confirm saving it:
+   ```plaintext
+   Save proposed README to "README.md"? (yes/no)
+   ```
+
+   Type `yes` to save the content to the specified path or `no` to discard it.
+
+4. **Exiting the assistant**: Type `exit` or `quit` if you want to terminate the session.
+
+This interactive dialogue makes it easy to generate README files tailored to your project's needs.
 
 ## Testing
 

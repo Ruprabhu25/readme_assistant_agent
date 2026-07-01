@@ -60,6 +60,7 @@ async function main(): Promise<void> {
   let history: ModelMessage[] = [];
 
   try {
+    debug.log("chat-start", "")
     while (true) {
       const input = (await rl.question("you> ")).trim();
       if (!input) continue;
