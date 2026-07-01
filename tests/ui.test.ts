@@ -14,6 +14,7 @@ import {
 } from "../src/ui.js";
 
 function stripAnsi(text: string): string {
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape codes are control characters by definition.
   return text.replace(/\x1b\[[0-9]+m|\x1b\[K/g, "");
 }
 
@@ -174,7 +175,11 @@ describe("stdout/stderr printers", () => {
   describe("printToolResult", () => {
     it.each([
       ["listFiles", { count: 3 }, "Found 3 file(s)."],
-      ["readFile", { totalChars: 10, truncated: false }, "Read 10 character(s)."],
+      [
+        "readFile",
+        { totalChars: 10, truncated: false },
+        "Read 10 character(s).",
+      ],
       [
         "readFile",
         { totalChars: 10, truncated: true },
@@ -193,18 +198,18 @@ describe("stdout/stderr printers", () => {
         { found: true, path: "README.md" },
         'Found an existing README at "README.md".',
       ],
-      [
-        "findExistingReadme",
-        { found: false },
-        "No existing README found.",
-      ],
+      ["findExistingReadme", { found: false }, "No existing README found."],
       [
         "summarizeFile",
         { lineCount: 5, sizeBytes: 100 },
         "5 line(s), 100 byte(s).",
       ],
       ["summarizeFile", { error: "File not found" }, "File not found"],
-      ["saveReadme", { chars: 42 }, "Staged a documentation proposal (42 character(s))."],
+      [
+        "saveReadme",
+        { chars: 42 },
+        "Staged a documentation proposal (42 character(s)).",
+      ],
       ["someUnknownTool", {}, "Done."],
     ])("describes a %s result as %j -> %s", (toolName, output, expected) => {
       const chunks = captureStdout();

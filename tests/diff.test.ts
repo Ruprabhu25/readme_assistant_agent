@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { renderDiff } from "../src/diff.js";
 
 function stripAnsi(text: string): string {
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape codes are control characters by definition.
   return text.replace(/\x1b\[[0-9]+m/g, "");
 }
 

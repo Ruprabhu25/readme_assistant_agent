@@ -206,9 +206,7 @@ const isDirectRun =
 
 if (isDirectRun) {
   main().catch((err) => {
-    printError(
-      err instanceof Error ? (err.stack ?? err.message) : String(err),
-    );
+    printError(err instanceof Error ? (err.stack ?? err.message) : String(err));
     process.exitCode = 1;
   });
 }
