@@ -117,6 +117,53 @@ describe("runAgentTurn", () => {
     expect(history[0]).toEqual({ role: "user", content: "Generate a README" });
   });
 
+  it("caps the turn at the max step count instead of looping forever on tool calls", async () => {
+    let stepCount = 0;
+    const model = new MockLanguageModelV4({
+      doStream: () => {
+        stepCount += 1;
+        return {
+          stream: convertArrayToReadableStream([
+            { type: "stream-start", warnings: [] },
+            {
+              type: "tool-call",
+              toolCallId: `call_${stepCount}`,
+              toolName: "loopTool",
+              input: JSON.stringify({}),
+            },
+            { type: "finish", finishReason: "tool-calls", usage: usage() },
+          ]),
+        };
+      },
+    });
+
+    const toolCalls: ToolCallEvent[] = [];
+    const tools = {
+      loopTool: tool({
+        description: "always signals there's more to do, tempting another call",
+        inputSchema: z.object({}),
+        execute: async () => ({ done: false }),
+      }),
+    };
+
+    const history = await runAgentTurn(
+      model,
+      tools,
+      [],
+      "Keep going",
+      "readme",
+      {
+        onToolCall: (e) => toolCalls.push(e),
+      },
+    );
+
+    // The model would call loopTool indefinitely; stepCountIs(8) must cut it off.
+    expect(stepCount).toBe(8);
+    expect(toolCalls).toHaveLength(8);
+    expect(history[0]).toEqual({ role: "user", content: "Keep going" });
+    expect(history.at(-1)?.role).toBe("tool");
+  });
+
   it("carries prior turn history into the next call's messages", async () => {
     const model = new MockLanguageModelV4({
       doStream: () => ({
