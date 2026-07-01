@@ -1,8 +1,17 @@
 #!/usr/bin/env node
 import { promises as fs } from "node:fs";
+import { pathToFileURL } from "node:url";
 import type { LanguageModel, ModelMessage } from "ai";
 import { runAgentTurn } from "./agent.js";
-import { loadModel } from "./config.js";
+import {
+  loadModel,
+  parseApiKeyEnvFlag,
+  parseApiKeyFileFlag,
+  parseModelFlag,
+  stripApiKeyEnvFlag,
+  stripApiKeyFileFlag,
+  stripModelFlag,
+} from "./config.js";
 import { createDebugLogger, parseDebugFlag, stripDebugFlag } from "./debug.js";
 import { renderDiff } from "./diff.js";
 import {
@@ -40,20 +49,27 @@ function readProposal(holder: {
   return holder.current;
 }
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   const rawArgs = process.argv.slice(2);
   const debugLogPath = parseDebugFlag(rawArgs);
   const historyPath = parseHistoryFlag(rawArgs);
+  const modelId = parseModelFlag(rawArgs);
+  const apiKeyFile = parseApiKeyFileFlag(rawArgs);
+  const apiKeyEnv = parseApiKeyEnvFlag(rawArgs);
   let mode = parseModeFlag(rawArgs) ?? DEFAULT_DOC_MODE;
   const positionalArgs = stripModeFlag(
-    stripHistoryFlag(stripDebugFlag(rawArgs)),
+    stripApiKeyEnvFlag(
+      stripApiKeyFileFlag(
+        stripModelFlag(stripHistoryFlag(stripDebugFlag(rawArgs))),
+      ),
+    ),
   );
   const workspaceArg = positionalArgs[0] ?? ".";
   const debug = createDebugLogger(debugLogPath);
 
   let model: LanguageModel;
   try {
-    model = loadModel();
+    model = await loadModel({ modelId, apiKeyFile, apiKeyEnv });
   } catch (err) {
     printError(err instanceof Error ? err.message : String(err));
     process.exitCode = 1;
@@ -184,7 +200,15 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err) => {
-  printError(err instanceof Error ? (err.stack ?? err.message) : String(err));
-  process.exitCode = 1;
-});
+const isDirectRun =
+  process.argv[1] !== undefined &&
+  import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isDirectRun) {
+  main().catch((err) => {
+    printError(
+      err instanceof Error ? (err.stack ?? err.message) : String(err),
+    );
+    process.exitCode = 1;
+  });
+}

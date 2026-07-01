@@ -43,6 +43,18 @@ describe("Workspace", () => {
     );
   });
 
+  it("computes a path relative to the workspace root", async () => {
+    const workspace = await Workspace.create(root);
+    expect(workspace.relative(path.join(root, "src", "index.ts"))).toBe(
+      path.join("src", "index.ts"),
+    );
+  });
+
+  it("returns '.' when the given path is the workspace root itself", async () => {
+    const workspace = await Workspace.create(root);
+    expect(workspace.relative(root)).toBe(".");
+  });
+
   it("rejects a workspace root that is not a directory", async () => {
     await expect(
       Workspace.create(path.join(root, "package.json")),

@@ -91,6 +91,19 @@ describe("searchFiles", () => {
     expect(result.matchCount).toBeLessThanOrEqual(50);
   });
 
+  it("skips files larger than the max file size instead of reading them", async () => {
+    const { workspace, root } = await fixture();
+    const huge = `${"x".repeat(1_000_001)}\nneedle-only-here`;
+    await writeFile(path.join(root, "huge.txt"), huge);
+
+    const tool = makeSearchFilesTool(workspace);
+    const result = await tool.execute!(
+      { query: "needle-only-here", dir: "." },
+      toolCallOpts,
+    );
+    expect(result.matchCount).toBe(0);
+  });
+
   it("rejects a search directory that escapes the workspace", async () => {
     const { workspace } = await fixture();
     const tool = makeSearchFilesTool(workspace);

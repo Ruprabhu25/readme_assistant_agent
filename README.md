@@ -12,30 +12,44 @@
 
 ## Installation
 
-1. Clone the repository:
-
+1. **Clone the Repository:**
    ```bash
    git clone <repository-url>
    cd telcor_ai_assistant
    ```
 
-2. Install dependencies:
-
+2. **Install Dependencies:**
    ```bash
    npm install
    ```
 
-3. Create a `.env` file from the example and set your OpenAI API key:
+3. **Create a `.env` File:**
+   - Duplicate the example configuration by running:
+     ```bash
+     cp .env.example .env
+     ```
+   - Set your OpenAI API key in the `.env` file:
+     ```plaintext
+     OPENAI_API_KEY=your_api_key_here
+     ```
 
-   ```bash
-   cp .env.example .env
-   ```
-
-   Add your OpenAI API key to the `.env` file:
-
-   ```plaintext
-   OPENAI_API_KEY=your_api_key_here
-   ```
+4. **Available Scripts:** After setup, you can run the following commands:
+   - **Start the CLI Tool:**
+     ```bash
+     npm run start
+     ```
+   - **Run in Development Mode:**
+     ```bash
+     npm run dev
+     ```
+   - **Run Tests:**
+     ```bash
+     npm run test
+     ```
+   - **Lint the Code:**
+     ```bash
+     npm run lint
+     ```
 
 ## Usage
 
@@ -49,6 +63,9 @@ You can pass additional arguments for debugging and history:
 
 - `--debug <path>`: Saves debug information to a specified file.
 - `--history <path>`: Saves chat history to a specified file.
+- `--model=<id>`: Overrides the model to use (default: `gpt-4o-mini`, or `OPENAI_MODEL` if set).
+- `--api-key-file=<path>`: Reads the OpenAI API key from a file instead of an environment variable.
+- `--api-key-env=<VAR>`: Reads the OpenAI API key from the named environment variable instead of `OPENAI_API_KEY`.
 
 The prompt will allow you to generate and propose changes to README files. Accept or reject changes interactively.
 
