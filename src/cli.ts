@@ -103,12 +103,12 @@ async function main(): Promise<void> {
         const abs = workspace.resolve(proposal.path);
         const existing = await fs.readFile(abs, "utf8").catch(() => "");
 
-        const wantsDiff = await askYesNo(`Show a diff of the proposed changes to "${proposal.path}"?`);
+        const wantsDiff = await askYesNo(rl, `Show a diff of the proposed changes to "${proposal.path}"?`);
         if (wantsDiff) {
           printSystem(renderDiff(existing, proposal.content));
         }
 
-        const accept = await askYesNo(`Accept these changes and save to "${proposal.path}"?`);
+        const accept = await askYesNo(rl, `Accept these changes and save to "${proposal.path}"?`);
         if (accept) {
           await fs.writeFile(abs, proposal.content, "utf8");
           printSystem(`Saved ${proposal.path}`);
