@@ -13,12 +13,6 @@ Telcor AI Assistant is a CLI agent built with the Vercel AI SDK. It provides an 
 ## Project Structure
 
 ```
-├── .claude/
-│   └── scheduled_tasks.lock
-├── dist-bin/
-│   ├── bundle.cjs
-│   ├── readme_assistant
-│   └── sea-prep.blob
 ├── scripts/
 │   ├── build-bin.mjs
 │   └── make-exe.mjs
@@ -50,7 +44,6 @@ Telcor AI Assistant is a CLI agent built with the Vercel AI SDK. It provides an 
 │   ├── agent.test.ts
 │   ├── fixtures.ts
 │   └── workspace.test.ts
-├── .env
 ├── .env.example
 ├── .gitignore
 ├── notes.md

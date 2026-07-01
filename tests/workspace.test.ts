@@ -43,6 +43,23 @@ describe("Workspace", () => {
     expect(files).toContain(path.join("src", "index.ts"));
     expect(files.some((f) => f.includes("node_modules"))).toBe(false);
   });
+
+  it("ignores dist-bin, .claude, and .env files, but keeps .env.example", async () => {
+    await mkdir(path.join(root, "dist-bin"));
+    await writeFile(path.join(root, "dist-bin", "bundle.cjs"), "");
+    await mkdir(path.join(root, ".claude"));
+    await writeFile(path.join(root, ".claude", "scheduled_tasks.lock"), "");
+    await writeFile(path.join(root, ".env"), "SECRET=1");
+    await writeFile(path.join(root, ".env.local"), "SECRET=2");
+    await writeFile(path.join(root, ".env.example"), "SECRET=");
+
+    const files = await listFilesRecursive(root, root);
+    expect(files.some((f) => f.includes("dist-bin"))).toBe(false);
+    expect(files.some((f) => f.includes(".claude"))).toBe(false);
+    expect(files).not.toContain(".env");
+    expect(files).not.toContain(".env.local");
+    expect(files).toContain(".env.example");
+  });
 });
 
 describe("formatFileTree", () => {

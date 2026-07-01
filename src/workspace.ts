@@ -39,7 +39,21 @@ export class Workspace {
   }
 }
 
-const DEFAULT_IGNORES = new Set(["node_modules", ".git", "dist", "build", ".next", "coverage"]);
+const DEFAULT_IGNORES = new Set([
+  "node_modules",
+  ".git",
+  "dist",
+  "dist-bin",
+  "build",
+  ".next",
+  "coverage",
+  ".claude",
+]);
+
+/** Matches .env and .env.* (e.g. .env.local), but not .env.example. */
+function isEnvFile(name: string): boolean {
+  return name !== ".env.example" && (name === ".env" || name.startsWith(".env."));
+}
 
 /** Recursively lists files under `dirAbs`, returning paths relative to `root`. */
 export async function listFilesRecursive(
@@ -53,7 +67,7 @@ export async function listFilesRecursive(
     if (depth > maxDepth) return;
     const entries = await fs.readdir(dir, { withFileTypes: true });
     for (const entry of entries) {
-      if (DEFAULT_IGNORES.has(entry.name)) continue;
+      if (DEFAULT_IGNORES.has(entry.name) || isEnvFile(entry.name)) continue;
       const abs = path.join(dir, entry.name);
       if (entry.isDirectory()) {
         await walk(abs, depth + 1);
