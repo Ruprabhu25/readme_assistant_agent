@@ -80,7 +80,7 @@ function describeToolCall(toolName: string, input: unknown): string {
     case "summarizeFile":
       return `Summarizing "${i.path ?? "unknown file"}"...`;
     case "saveReadme":
-      return `Drafting a README proposal for "${i.path ?? "README.md"}"...`;
+      return `Drafting a documentation proposal for "${i.path ?? "README.md"}"...`;
     default:
       return `Running ${toolName}...`;
   }
@@ -111,7 +111,7 @@ function describeToolResult(toolName: string, output: unknown): string {
         ? String(o.error)
         : `${o.lineCount ?? "?"} line(s), ${o.sizeBytes ?? "?"} byte(s).`;
     case "saveReadme":
-      return `Staged a README proposal (${o.chars ?? "?"} character(s)).`;
+      return `Staged a documentation proposal (${o.chars ?? "?"} character(s)).`;
     default:
       return "Done.";
   }

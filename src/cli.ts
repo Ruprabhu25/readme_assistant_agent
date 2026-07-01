@@ -6,6 +6,14 @@ import { loadModel } from "./config.js";
 import { createDebugLogger, parseDebugFlag, stripDebugFlag } from "./debug.js";
 import { renderDiff } from "./diff.js";
 import {
+  DEFAULT_DOC_MODE,
+  describeModes,
+  DOC_MODES,
+  isDocModeId,
+  parseModeFlag,
+  stripModeFlag,
+} from "./docModes.js";
+import {
   loadHistory,
   parseHistoryFlag,
   saveHistory,
@@ -36,7 +44,10 @@ async function main(): Promise<void> {
   const rawArgs = process.argv.slice(2);
   const debugLogPath = parseDebugFlag(rawArgs);
   const historyPath = parseHistoryFlag(rawArgs);
-  const positionalArgs = stripHistoryFlag(stripDebugFlag(rawArgs));
+  let mode = parseModeFlag(rawArgs) ?? DEFAULT_DOC_MODE;
+  const positionalArgs = stripModeFlag(
+    stripHistoryFlag(stripDebugFlag(rawArgs)),
+  );
   const workspaceArg = positionalArgs[0] ?? ".";
   const debug = createDebugLogger(debugLogPath);
 
@@ -65,7 +76,8 @@ async function main(): Promise<void> {
     proposalHolder.current = proposal;
   });
 
-  printSystem(`README Assistant — workspace: ${workspace.root}`);
+  printSystem(`Documentation Assistant — workspace: ${workspace.root}`);
+  printSystem(`Mode: ${DOC_MODES[mode].label} (use /mode to switch)`);
   if (debugLogPath)
     printSystem(`Debug logging enabled — writing to ${debugLogPath}`);
   if (historyPath)
@@ -84,6 +96,21 @@ async function main(): Promise<void> {
       if (!input) continue;
       if (/^(exit|quit)$/i.test(input)) break;
 
+      if (/^\/mode\b/i.test(input)) {
+        const requested = input.slice("/mode".length).trim();
+        if (!requested) {
+          printSystem(`Available modes:\n${describeModes(mode)}`);
+        } else if (isDocModeId(requested)) {
+          mode = requested;
+          printSystem(`Switched to mode: ${DOC_MODES[mode].label}`);
+        } else {
+          printError(
+            `Unknown mode "${requested}". Available modes:\n${describeModes(mode)}`,
+          );
+        }
+        continue;
+      }
+
       proposalHolder.current = null;
       debug.log("user-input", input);
 
@@ -97,7 +124,7 @@ async function main(): Promise<void> {
       };
 
       try {
-        history = await runAgentTurn(model, tools, history, input, {
+        history = await runAgentTurn(model, tools, history, input, mode, {
           onTextDelta: (delta) => {
             ensurePrefix();
             printTextDelta(delta);
