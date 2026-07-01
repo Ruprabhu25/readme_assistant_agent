@@ -14,14 +14,24 @@ if (process.platform === "darwin") {
   // The system `node` is often a universal (fat) binary containing both
   // x86_64 and arm64 slices, each embedding the SEA sentinel fuse string.
   // postject rejects binaries with multiple sentinel occurrences, so we
-  // extract just the native-arch slice before injecting.
-  await execFileAsync("lipo", [
+  // extract just the native-arch slice before injecting. Some builds of
+  // node (e.g. GitHub-hosted runners) ship single-arch binaries already,
+  // where `lipo -thin` errors out — copy those as-is instead.
+  const { stdout: archs } = await execFileAsync("lipo", [
+    "-archs",
     process.execPath,
-    "-thin",
-    process.arch === "arm64" ? "arm64" : "x86_64",
-    "-output",
-    outPath,
   ]);
+  if (archs.trim().split(/\s+/).length > 1) {
+    await execFileAsync("lipo", [
+      process.execPath,
+      "-thin",
+      process.arch === "arm64" ? "arm64" : "x86_64",
+      "-output",
+      outPath,
+    ]);
+  } else {
+    await copyFile(process.execPath, outPath);
+  }
   await execFileAsync("codesign", ["--remove-signature", outPath]);
 } else {
   await copyFile(process.execPath, outPath);
