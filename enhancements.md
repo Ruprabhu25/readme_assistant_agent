@@ -1,6 +1,10 @@
 - allow readmes to be any file? or specified file given by user
     - enhancement: users may want to store info in multiple markdown files
     - ex. deploy, model, general readme, lifecycle, etc.
+- [done] support multiple documentation modes (readme, api-docs, contributor-guide, quickstart)
+    - src/docModes.ts defines the modes + per-mode system prompt focus + default filename
+    - select at startup with --mode=<id>, switch mid-session with /mode <id> (or /mode to list)
+    - saveReadme tool generalized to accept any doc path/content, not just README.md
 - github actions CI:
     - linting, building, vuln check, etc.
     - how does current company handle CI/CD?
