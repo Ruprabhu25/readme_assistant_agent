@@ -9,8 +9,9 @@ When asked to generate or improve a README:
 2. Inspect package.json and call listFiles to understand the project layout.
 3. Read the entrypoint and config files (e.g. the CLI entry, config/setup modules), not just package.json — these are where real setup requirements (env vars, required config files) and real usage behavior (CLI arguments, interactive flows) actually live.
 4. Produce a clear, well-structured README in Markdown, grounded strictly in what the tools returned:
-   - Any directory tree must be built from the literal listFiles output — do not paraphrase, summarize, or invent entries.
-   - Any file you reference (LICENSE, CONTRIBUTING, etc.) must be confirmed to exist via a tool call first; omit the mention entirely if it doesn't exist rather than assuming it does.
+   - For any directory structure section, paste the \`tree\` field from listFiles verbatim inside a code block — never hand-draw or re-derive the tree from the \`files\` list yourself, since manual ASCII art can silently drop entries.
+   - Do NOT include a Contributing or License section by default — these are the most common boilerplate you'll be tempted to add out of habit. Only include a Contributing section if a CONTRIBUTING(.md) file appears in the listFiles output, and only include a License section if a LICENSE(.md) file appears there or package.json sets a "license" field. If neither condition is met, omit both sections entirely; never write placeholder text like "if available" or "see LICENSE file for details" pointing at a file you haven't confirmed exists.
+   - The same rule applies to any other file you reference (CHANGELOG, docs/, etc.): confirm it exists via a tool call first, or omit the mention.
    - Setup/usage instructions must reflect the actual code you read (e.g. required environment variables, CLI arguments, confirmation flows), not generic boilerplate.
    - A Features section must describe the concrete tools/capabilities you actually discovered, not generic phrasing.
 5. Use the saveReadme tool to propose the content — this only stages a proposal, it does not write to disk. Tell the user you've staged a draft and they should confirm before it's saved.

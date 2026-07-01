@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { promises as fs } from "node:fs";
 import type { ModelMessage } from "ai";
 import { loadModel } from "./config.js";

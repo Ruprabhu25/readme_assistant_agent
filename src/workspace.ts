@@ -66,3 +66,49 @@ export async function listFilesRecursive(
   await walk(dirAbs, 0);
   return results.sort();
 }
+
+interface TreeNode {
+  children: Map<string, TreeNode>;
+  isFile: boolean;
+}
+
+/** Renders a flat list of relative paths as an ASCII tree, directories first, alphabetical within each. */
+export function formatFileTree(paths: string[]): string {
+  const root: TreeNode = { children: new Map(), isFile: false };
+
+  for (const p of paths) {
+    const parts = p.split(path.sep);
+    let cur = root;
+    parts.forEach((part, i) => {
+      let next = cur.children.get(part);
+      if (!next) {
+        next = { children: new Map(), isFile: i === parts.length - 1 };
+        cur.children.set(part, next);
+      }
+      cur = next;
+    });
+  }
+
+  function sortedEntries(node: TreeNode): [string, TreeNode][] {
+    return [...node.children.entries()].sort(([aName, aNode], [bName, bNode]) => {
+      if (aNode.isFile !== bNode.isFile) return aNode.isFile ? 1 : -1;
+      return aName.localeCompare(bName);
+    });
+  }
+
+  const lines: string[] = [];
+  function render(node: TreeNode, prefix: string): void {
+    const entries = sortedEntries(node);
+    entries.forEach(([name, child], idx) => {
+      const isLast = idx === entries.length - 1;
+      const connector = isLast ? "└── " : "├── ";
+      lines.push(`${prefix}${connector}${child.isFile ? name : `${name}/`}`);
+      if (!child.isFile) {
+        render(child, prefix + (isLast ? "    " : "│   "));
+      }
+    });
+  }
+  render(root, "");
+
+  return lines.join("\n");
+}

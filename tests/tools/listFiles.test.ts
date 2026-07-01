@@ -25,6 +25,19 @@ describe("listFiles", () => {
     expect(result.files).not.toContain("package.json");
   });
 
+  it("returns a pre-rendered tree that includes every returned file", async () => {
+    const { workspace } = await fixture();
+    const tool = makeListFilesTool(workspace);
+    const result = await tool.execute!({ dir: "." }, toolCallOpts);
+    for (const file of result.files) {
+      const parts = file.split(path.sep);
+      expect(result.tree).toContain(parts[parts.length - 1]);
+    }
+    expect(result.tree).toContain("src/");
+    expect(result.tree).toContain("├──");
+    expect(result.tree).toContain("└──");
+  });
+
   it("excludes .git, dist, and build directories", async () => {
     const { workspace, root } = await fixture();
     await mkdir(path.join(root, ".git"), { recursive: true });

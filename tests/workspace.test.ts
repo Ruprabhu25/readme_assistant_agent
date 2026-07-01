@@ -2,7 +2,7 @@ import { describe, expect, it, beforeAll, afterAll } from "vitest";
 import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { Workspace, WorkspaceBoundsError, listFilesRecursive } from "../src/workspace.js";
+import { Workspace, WorkspaceBoundsError, formatFileTree, listFilesRecursive } from "../src/workspace.js";
 
 describe("Workspace", () => {
   let root: string;
@@ -42,5 +42,26 @@ describe("Workspace", () => {
     expect(files).toContain("package.json");
     expect(files).toContain(path.join("src", "index.ts"));
     expect(files.some((f) => f.includes("node_modules"))).toBe(false);
+  });
+});
+
+describe("formatFileTree", () => {
+  it("nests files under their parent directories, dirs before files", () => {
+    const tree = formatFileTree(["package.json", path.join("src", "index.ts"), path.join("src", "util.ts")]);
+    expect(tree).toBe(["├── src/", "│   ├── index.ts", "│   └── util.ts", "└── package.json"].join("\n"));
+  });
+
+  it("includes every path exactly once, even for deeply nested siblings", () => {
+    const paths = [
+      "a.ts",
+      path.join("src", "tools", "index.ts"),
+      path.join("src", "tools", "listFiles.ts"),
+      path.join("src", "ui.ts"),
+      path.join("src", "workspace.ts"),
+    ];
+    const tree = formatFileTree(paths);
+    for (const p of paths) {
+      expect(tree).toContain(path.basename(p));
+    }
   });
 });
