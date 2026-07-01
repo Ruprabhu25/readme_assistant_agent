@@ -48,6 +48,7 @@ const DEFAULT_IGNORES = new Set([
   ".next",
   "coverage",
   ".claude",
+  "history.json",
 ]);
 
 /** Matches .env and .env.* (e.g. .env.local), but not .env.example. */

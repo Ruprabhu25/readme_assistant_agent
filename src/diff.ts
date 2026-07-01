@@ -3,9 +3,16 @@ const GREEN = "\x1b[32m";
 const DIM = "\x1b[2m";
 const RESET = "\x1b[0m";
 
-type Op = { kind: "equal" | "add" | "remove"; line: string };
+const CONTEXT_LINES = 5;
 
-/** Line-based LCS diff, rendered unified-diff style with +/- markers. */
+type Op = {
+  kind: "equal" | "add" | "remove";
+  line: string;
+  oldLine: number | null;
+  newLine: number | null;
+};
+
+/** Line-based LCS diff, rendered unified-diff style with +/- markers, line numbers, and hunk context. */
 export function renderDiff(before: string, after: string): string {
   const a = before.split("\n");
   const b = after.split("\n");
@@ -15,13 +22,42 @@ export function renderDiff(before: string, after: string): string {
     return `${DIM}No changes.${RESET}`;
   }
 
-  return ops
-    .map((op) => {
-      if (op.kind === "add") return `${GREEN}+ ${op.line}${RESET}`;
-      if (op.kind === "remove") return `${RED}- ${op.line}${RESET}`;
-      return `${DIM}  ${op.line}${RESET}`;
-    })
-    .join("\n");
+  const keep = new Array(ops.length).fill(false);
+  ops.forEach((op, idx) => {
+    if (op.kind === "equal") return;
+    for (
+      let k = Math.max(0, idx - CONTEXT_LINES);
+      k <= Math.min(ops.length - 1, idx + CONTEXT_LINES);
+      k++
+    ) {
+      keep[k] = true;
+    }
+  });
+
+  const oldWidth = String(a.length).length;
+  const newWidth = String(b.length).length;
+  const gutter = (op: Op) =>
+    `${(op.oldLine ?? "").toString().padStart(oldWidth)} ${(op.newLine ?? "").toString().padStart(newWidth)}`;
+
+  const lines: string[] = [];
+  for (let idx = 0; idx < ops.length; idx++) {
+    if (!keep[idx]) {
+      if (keep[idx - 1]) {
+        lines.push(
+          `${DIM}${" ".repeat(oldWidth)} ${" ".repeat(newWidth)}   ⋮${RESET}`,
+        );
+      }
+      continue;
+    }
+    const op = ops[idx];
+    if (op.kind === "add")
+      lines.push(`${GREEN}${gutter(op)} + ${op.line}${RESET}`);
+    else if (op.kind === "remove")
+      lines.push(`${RED}${gutter(op)} - ${op.line}${RESET}`);
+    else lines.push(`${DIM}${gutter(op)}   ${op.line}${RESET}`);
+  }
+
+  return lines.join("\n");
 }
 
 function diffLines(a: string[], b: string[]): Op[] {
@@ -45,19 +81,25 @@ function diffLines(a: string[], b: string[]): Op[] {
   let j = 0;
   while (i < n && j < m) {
     if (a[i] === b[j]) {
-      ops.push({ kind: "equal", line: a[i] });
+      ops.push({ kind: "equal", line: a[i], oldLine: i + 1, newLine: j + 1 });
       i++;
       j++;
     } else if (lcs[i + 1][j] >= lcs[i][j + 1]) {
-      ops.push({ kind: "remove", line: a[i] });
+      ops.push({ kind: "remove", line: a[i], oldLine: i + 1, newLine: null });
       i++;
     } else {
-      ops.push({ kind: "add", line: b[j] });
+      ops.push({ kind: "add", line: b[j], oldLine: null, newLine: j + 1 });
       j++;
     }
   }
-  while (i < n) ops.push({ kind: "remove", line: a[i++] });
-  while (j < m) ops.push({ kind: "add", line: b[j++] });
+  while (i < n) {
+    ops.push({ kind: "remove", line: a[i], oldLine: i + 1, newLine: null });
+    i++;
+  }
+  while (j < m) {
+    ops.push({ kind: "add", line: b[j], oldLine: null, newLine: j + 1 });
+    j++;
+  }
 
   return ops;
 }

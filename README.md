@@ -1,88 +1,57 @@
-# Telcor AI Assistant
+# telcor_ai_assistant
 
-`telcor_ai_assistant` is a README Assistant CLI agent built with the Vercel AI SDK. It helps users generate and manage README files within their project workspace.
-
-## Table of Contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Directory Structure](#directory-structure)
-- [Configuration](#configuration)
+## Description
+README Assistant CLI agent built with the Vercel AI SDK.
 
 ## Installation
-
-1. **Clone the Repository:**
+1. **Clone the repository**:
    ```bash
    git clone <repository-url>
    cd telcor_ai_assistant
    ```
-
-2. **Install Dependencies:**
+2. **Install dependencies**:
    ```bash
    npm install
    ```
-
-3. **Create a `.env` File:**
-   - Duplicate the example configuration by running:
-     ```bash
-     cp .env.example .env
-     ```
-   - Set your OpenAI API key in the `.env` file:
-     ```plaintext
-     OPENAI_API_KEY=your_api_key_here
-     ```
-
-4. **Available Scripts:** After setup, you can run the following commands:
-   - **Start the CLI Tool:**
-     ```bash
-     npm run start
-     ```
-   - **Run in Development Mode:**
-     ```bash
-     npm run dev
-     ```
-   - **Run Tests:**
-     ```bash
-     npm run test
-     ```
-   - **Lint the Code:**
-     ```bash
-     npm run lint
-     ```
+3. **Set up environment variables**:
+   Create a `.env` file based on the provided `.env.example`. This file will hold your OpenAI API key and any other necessary environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   Open the `.env` file and add your OpenAI API key:
+   ```plaintext
+   OPENAI_API_KEY=your_api_key_here
+   ```
+4. **Run the CLI tool**:
+   Execute the CLI tool with the following command:
+   ```bash
+   npm start
+   ```
+   Additional command-line flags can be used to configure the behavior of the assistant (e.g., `--model=<id>`, `--api-key-file=<path>`, `--api-key-env=<VAR>`).
 
 ## Usage
-
-Run the CLI tool with the following command:
-
+Run the CLI using:
 ```bash
-npm run start
+npm start
 ```
-
-You can pass additional arguments for debugging and history:
-
-- `--debug <path>`: Saves debug information to a specified file.
-- `--history <path>`: Saves chat history to a specified file.
-- `--model=<id>`: Overrides the model to use (default: `gpt-4o-mini`, or `OPENAI_MODEL` if set).
-- `--api-key-file=<path>`: Reads the OpenAI API key from a file instead of an environment variable.
-- `--api-key-env=<VAR>`: Reads the OpenAI API key from the named environment variable instead of `OPENAI_API_KEY`.
-
-The prompt will allow you to generate and propose changes to README files. Accept or reject changes interactively.
+This will execute the command defined in the `src/cli.ts` file.
 
 ## Features
-
-- GPT-4 powered interactive assistant for README generation.
-- Diff view of proposed changes to track modifications.
-- Chat history feature to persist conversations.
-- Debug logging for troubleshooting.
+- **Documentation Assistance**: Offers tailored help for drafting and improving documentation across various modes (e.g., README, API docs).
+- **Model Selection**: Select from different OpenAI models using command-line flags.
+- **API Key Management**: Load and manage API keys from environment variables or files.
+- **Interactive CLI**: Engage with the assistant interactively in a console environment.
+- **Diff Visualization**: Provides visual comparisons of text changes with unified diff style representation.
+- **History Management**: Stores and retrieves interaction history for continuity in conversations.
+- **Custom Debugging**: Supports configurable logging for debugging purposes.
+- **Path Management**: Ensures safe handling of file paths, preventing unauthorized access beyond designated workspace boundaries.
 
 ## Directory Structure
-
-```plaintext
-.
+```
 ├── .github/
 │   └── workflows/
-│       └── ci.yml
+│       ├── ci.yml
+│       └── release-macos.yml
 ├── scripts/
 │   ├── build-bin.mjs
 │   └── make-exe.mjs
@@ -101,6 +70,7 @@ The prompt will allow you to generate and propose changes to README files. Accep
 │   ├── config.ts
 │   ├── debug.ts
 │   ├── diff.ts
+│   ├── docModes.ts
 │   ├── history.ts
 │   ├── ui.ts
 │   └── workspace.ts
@@ -108,6 +78,7 @@ The prompt will allow you to generate and propose changes to README files. Accep
 │   ├── tools/
 │   │   ├── findExistingReadme.test.ts
 │   │   ├── helpers.ts
+│   │   ├── index.test.ts
 │   │   ├── inspectPackageJson.test.ts
 │   │   ├── listFiles.test.ts
 │   │   ├── readFile.test.ts
@@ -115,7 +86,12 @@ The prompt will allow you to generate and propose changes to README files. Accep
 │   │   ├── searchFiles.test.ts
 │   │   └── summarizeFile.test.ts
 │   ├── agent.test.ts
+│   ├── config.test.ts
+│   ├── debug.test.ts
+│   ├── diff.test.ts
+│   ├── docModes.test.ts
 │   ├── fixtures.ts
+│   ├── history.test.ts
 │   ├── ui.test.ts
 │   └── workspace.test.ts
 ├── .env.example
@@ -123,17 +99,12 @@ The prompt will allow you to generate and propose changes to README files. Accep
 ├── biome.json
 ├── debug.log
 ├── enhancements.md
-├── history.json
 ├── package-lock.json
 ├── package.json
 ├── project.md
+├── QUICKSTART.md
+├── README.md
 ├── sea-config.json
 ├── tsconfig.json
 └── vitest.config.ts
 ```
-
-## Configuration
-
-Ensure the following environment variable is set in your `.env` file:
-
-- `OPENAI_API_KEY`: Your OpenAI API key for accessing the AI models.

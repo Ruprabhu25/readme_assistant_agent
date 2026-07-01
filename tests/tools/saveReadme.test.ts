@@ -66,4 +66,29 @@ describe("saveReadme", () => {
     ).rejects.toThrow(WorkspaceBoundsError);
     expect(called).toBe(false);
   });
+
+  it("rejects a non-.md target path", async () => {
+    const { workspace } = await fixture();
+    let called = false;
+    const tool = makeSaveReadmeTool(workspace, () => {
+      called = true;
+    });
+    const result = await tool.execute!(
+      { path: "notes.txt", content: "x" },
+      toolCallOpts,
+    );
+    expect(result.staged).toBe(false);
+    expect(result.error).toMatch(/\.md/);
+    expect(called).toBe(false);
+  });
+
+  it("accepts .MD with any casing", async () => {
+    const { workspace } = await fixture();
+    const tool = makeSaveReadmeTool(workspace, () => {});
+    const result = await tool.execute!(
+      { path: "README.MD", content: "x" },
+      toolCallOpts,
+    );
+    expect(result.staged).toBe(true);
+  });
 });

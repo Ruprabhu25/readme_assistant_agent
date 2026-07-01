@@ -29,6 +29,13 @@ export function makeSaveReadmeTool(
       content: z.string().min(1).describe("Full document content to propose."),
     }),
     execute: async ({ path: relPath, content }) => {
+      if (!relPath.toLowerCase().endsWith(".md")) {
+        return {
+          staged: false as const,
+          path: relPath,
+          error: "Only .md files can be proposed. Use a path ending in .md.",
+        };
+      }
       workspace.resolve(relPath); // validate it's in-bounds without writing
       onPropose({ path: relPath, content });
       return {
