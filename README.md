@@ -7,8 +7,9 @@ Telcor AI Assistant is a CLI agent built with the Vercel AI SDK. It provides an 
 ## Features
 
 - **Interactive Command Line Interface**: Engage in a conversation with the assistant to generate README content.
-- **Environment Configuration**: Load environment settings from a `.env` file, ensuring necessary API keys are provided.
+- **Environment Configuration**: Load environment settings from a `.env` file, ensuring necessary API keys are provided. The primary expected variable is `OPENAI_API_KEY`.
 - **File Management**: Proposals for README content can be confirmed and saved directly to specified paths.
+- **Workspace Context Usage**: The assistant can inspect files in the workspace, providing tailored responses and suggestions based on the project's actual structure and content.
 
 ## Project Structure
 
@@ -55,6 +56,12 @@ Telcor AI Assistant is a CLI agent built with the Vercel AI SDK. It provides an 
 └── vitest.config.ts
 ```
 
+### Directory Explanations
+
+- `scripts/`: Contains scripts for building the project and creating executable binaries.
+- `src/`: Source code for the assistant, divided into various tools and main application files.
+- `tests/`: Unit tests for the assistant's functionality, organized similarly to the source code for easy maintenance.
+
 ## Installation
 
 1. Clone the repository:
@@ -91,3 +98,5 @@ To run the tests, use:
 ```bash
 npm test
 ```
+
+The testing framework used is [Vitest](https://vitest.dev/), which enables rapid testing of the assistant's functionality.

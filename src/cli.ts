@@ -5,6 +5,7 @@ import { loadModel } from "./config.js";
 import { Workspace } from "./workspace.js";
 import { buildTools, type SaveReadmeProposal } from "./tools/index.js";
 import { runAgentTurn } from "./agent.js";
+import { createDebugLogger, parseDebugFlag, stripDebugFlag } from "./debug.js";
 import {
   confirm,
   createPromptInterface,
@@ -22,7 +23,11 @@ function readProposal(holder: { current: SaveReadmeProposal | null }): SaveReadm
 }
 
 async function main(): Promise<void> {
-  const workspaceArg = process.argv[2] ?? ".";
+  const rawArgs = process.argv.slice(2);
+  const debugLogPath = parseDebugFlag(rawArgs);
+  const positionalArgs = stripDebugFlag(rawArgs);
+  const workspaceArg = positionalArgs[0] ?? ".";
+  const debug = createDebugLogger(debugLogPath);
 
   let model;
   try {
@@ -48,6 +53,7 @@ async function main(): Promise<void> {
   });
 
   printSystem(`README Assistant — workspace: ${workspace.root}`);
+  if (debugLogPath) printSystem(`Debug logging enabled — writing to ${debugLogPath}`);
   printSystem('Type a message, or "exit" to quit.\n');
 
   const rl = createPromptInterface();
@@ -61,16 +67,25 @@ async function main(): Promise<void> {
 
       proposalHolder.current = null;
       printAssistantPrefix();
+      debug.log("user-input", input);
 
       try {
         history = await runAgentTurn(model, tools, history, input, {
           onTextDelta: printTextDelta,
-          onToolCall: (e) => printToolCall(e.toolName, e.input),
-          onToolResult: (e) => printToolResult(e.toolName, e.output),
+          onToolCall: (e) => {
+            printToolCall(e.toolName, e.input);
+            debug.log("tool-call", e);
+          },
+          onToolResult: (e) => {
+            printToolResult(e.toolName, e.output);
+            debug.log("tool-result", e);
+          },
         });
       } catch (err) {
         printNewline();
-        printError(err instanceof Error ? err.message : String(err));
+        const message = err instanceof Error ? err.message : String(err);
+        printError(message);
+        debug.log("error", message);
         continue;
       }
 
