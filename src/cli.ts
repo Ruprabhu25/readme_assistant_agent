@@ -6,6 +6,7 @@ import { Workspace } from "./workspace.js";
 import { buildTools, type SaveReadmeProposal } from "./tools/index.js";
 import { runAgentTurn } from "./agent.js";
 import { createDebugLogger, parseDebugFlag, stripDebugFlag } from "./debug.js";
+import { loadHistory, parseHistoryFlag, saveHistory, stripHistoryFlag } from "./history.js";
 import { renderDiff } from "./diff.js";
 import {
   askYesNo,
@@ -26,7 +27,8 @@ function readProposal(holder: { current: SaveReadmeProposal | null }): SaveReadm
 async function main(): Promise<void> {
   const rawArgs = process.argv.slice(2);
   const debugLogPath = parseDebugFlag(rawArgs);
-  const positionalArgs = stripDebugFlag(rawArgs);
+  const historyPath = parseHistoryFlag(rawArgs);
+  const positionalArgs = stripHistoryFlag(stripDebugFlag(rawArgs));
   const workspaceArg = positionalArgs[0] ?? ".";
   const debug = createDebugLogger(debugLogPath);
 
@@ -55,10 +57,11 @@ async function main(): Promise<void> {
 
   printSystem(`README Assistant — workspace: ${workspace.root}`);
   if (debugLogPath) printSystem(`Debug logging enabled — writing to ${debugLogPath}`);
+  if (historyPath) printSystem(`Chat history enabled — persisting to ${historyPath}`);
   printSystem('Type a message, or "exit" to quit.\n');
 
   const rl = createPromptInterface();
-  let history: ModelMessage[] = [];
+  let history: ModelMessage[] = historyPath ? await loadHistory(historyPath) : [];
 
   try {
     debug.log("chat-start", "")
@@ -90,6 +93,8 @@ async function main(): Promise<void> {
         debug.log("error", message);
         continue;
       }
+
+      if (historyPath) await saveHistory(historyPath, history);
 
       printNewline();
 
