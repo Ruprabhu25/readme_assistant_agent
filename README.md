@@ -119,4 +119,20 @@ To run the tests, use:
 npm test
 ```
 
-The testing framework used is [Vitest](https://vitest.dev/), which enables rapid testing of the assistant's functionality.
+The testing framework used is [Vitest](https://vitest.dev/), which enables rapid testing of the assistant's functionality. Tests are located in the `tests/` directory, which includes unit tests for the various tools used in the assistant:
+
+```
+└── tests/
+    ├── tools/
+    │   ├── findExistingReadme.test.ts
+    │   ├── inspectPackageJson.test.ts
+    │   ├── listFiles.test.ts
+    │   ├── readFile.test.ts
+    │   ├── saveReadme.test.ts
+    │   ├── searchFiles.test.ts
+    │   └── summarizeFile.test.ts
+    ├── agent.test.ts
+    └── workspace.test.ts
+```
+
+These tests ensure that the assistant functions correctly and robustly when handling various project scenarios.

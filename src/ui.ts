@@ -47,11 +47,16 @@ function summarize(value: unknown, maxLen = 160): string {
   return text;
 }
 
-export async function confirm(question: string): Promise<boolean> {
+/** Prompts until the user gives an explicit yes/no answer, reprompting on anything else. */
+export async function askYesNo(question: string): Promise<boolean> {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   try {
-    const answer = await rl.question(`${YELLOW}${question} (y/n)${RESET} `);
-    return /^y(es)?$/i.test(answer.trim());
+    while (true) {
+      const answer = (await rl.question(`${YELLOW}${question} (y/n)${RESET} `)).trim();
+      if (/^y(es)?$/i.test(answer)) return true;
+      if (/^n(o)?$/i.test(answer)) return false;
+      process.stdout.write(`${DIM}Please answer "y" or "n".${RESET}\n`);
+    }
   } finally {
     rl.close();
   }

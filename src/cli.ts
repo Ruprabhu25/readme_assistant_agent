@@ -6,8 +6,9 @@ import { Workspace } from "./workspace.js";
 import { buildTools, type SaveReadmeProposal } from "./tools/index.js";
 import { runAgentTurn } from "./agent.js";
 import { createDebugLogger, parseDebugFlag, stripDebugFlag } from "./debug.js";
+import { renderDiff } from "./diff.js";
 import {
-  confirm,
+  askYesNo,
   createPromptInterface,
   printAssistantPrefix,
   printError,
@@ -94,9 +95,16 @@ async function main(): Promise<void> {
 
       const proposal = readProposal(proposalHolder);
       if (proposal) {
-        const ok = await confirm(`Save proposed README to "${proposal.path}"?`);
-        if (ok) {
-          const abs = workspace.resolve(proposal.path);
+        const abs = workspace.resolve(proposal.path);
+        const existing = await fs.readFile(abs, "utf8").catch(() => "");
+
+        const wantsDiff = await askYesNo(`Show a diff of the proposed changes to "${proposal.path}"?`);
+        if (wantsDiff) {
+          printSystem(renderDiff(existing, proposal.content));
+        }
+
+        const accept = await askYesNo(`Accept these changes and save to "${proposal.path}"?`);
+        if (accept) {
           await fs.writeFile(abs, proposal.content, "utf8");
           printSystem(`Saved ${proposal.path}`);
         } else {
