@@ -1,52 +1,57 @@
 # telcor_ai_assistant
 
 ## Description
-README Assistant CLI agent built with the Vercel AI SDK.
-
-## Installation
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd telcor_ai_assistant
-   ```
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-3. **Set up environment variables**:
-   Create a `.env` file based on the provided `.env.example`. This file will hold your OpenAI API key and any other necessary environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-   Open the `.env` file and add your OpenAI API key:
-   ```plaintext
-   OPENAI_API_KEY=your_api_key_here
-   ```
-4. **Run the CLI tool**:
-   Execute the CLI tool with the following command:
-   ```bash
-   npm start
-   ```
-   Additional command-line flags can be used to configure the behavior of the assistant (e.g., `--model=<id>`, `--api-key-file=<path>`, `--api-key-env=<VAR>`).
-
-## Usage
-Run the CLI using:
-```bash
-npm start
-```
-This will execute the command defined in the `src/cli.ts` file.
+A README Assistant CLI agent built with the Vercel AI SDK. This tool helps users understand a local project workspace and draft or improve its documentation.
 
 ## Features
-- **Documentation Assistance**: Offers tailored help for drafting and improving documentation across various modes (e.g., README, API docs).
-- **Model Selection**: Select from different OpenAI models using command-line flags.
-- **API Key Management**: Load and manage API keys from environment variables or files.
-- **Interactive CLI**: Engage with the assistant interactively in a console environment.
-- **Diff Visualization**: Provides visual comparisons of text changes with unified diff style representation.
-- **History Management**: Stores and retrieves interaction history for continuity in conversations.
-- **Custom Debugging**: Supports configurable logging for debugging purposes.
-- **Path Management**: Ensures safe handling of file paths, preventing unauthorized access beyond designated workspace boundaries.
+- CLI-based interaction for documentation assistance.
+- Ability to parse command-line arguments for flexible usage.
+- Supports API key management.
+- Logs and debug options for enhanced user experience.
 
-## Directory Structure
+## Installation
+To set up the project, create a `.env` file in the root directory based on the provided `.env.example` file. This file should contain your API keys and configurations required to connect with the AI models.
+
+## Setup
+To set up the project, you need to create a `.env` file in the root directory based on the provided `.env.example` file. This file should contain your API keys and configurations required to connect with the AI models. For example, it should look like this:
+```
+OPENAI_API_KEY=your_api_key_here
+```
+
+## Cloning the Repository
+To clone this repository, use the following command:
+```bash
+git clone git@github.com:Ruprabhu25/readme_assistant_agent.git
+```
+This will create a local copy of the project on your machine, allowing you to make changes and run it as needed.
+
+## Usage
+Run the CLI tool with the following command:
+```bash
+npm run start
+```
+
+You can also specify different configurations via command-line arguments, such as:
+- `--model=<id>`: Specify the model you want to use.
+- `--api-key-file=<path>`: Path to the file containing your API key.
+- `--api-key-env=<VAR>`: Set an environment variable for the API key.
+
+## Testing
+To run all tests, use the command:
+```bash
+npm run test
+```
+To run tests in watch mode, which automatically reruns tests when files change, use:
+```bash
+npm run test:watch
+```
+For coverage reports, to view the test coverage, you can run:
+```bash
+npm run coverage
+```
+
+## Project Structure
+Here's an overview of the project's directory layout:
 ```
 ├── .github/
 │   └── workflows/
@@ -97,13 +102,13 @@ This will execute the command defined in the `src/cli.ts` file.
 ├── .env.example
 ├── .gitignore
 ├── biome.json
+├── CONTRIBUTING.md
 ├── debug.log
 ├── enhancements.md
 ├── package-lock.json
 ├── package.json
 ├── project.md
 ├── QUICKSTART.md
-├── README.md
 ├── sea-config.json
 ├── tsconfig.json
 └── vitest.config.ts
