@@ -75,10 +75,13 @@ export function isDocModeId(value: string): value is DocModeId {
 
 /** Looks for --mode or --mode=<id> in argv, returning a valid DocModeId or null. */
 export function parseModeFlag(argv: string[]): DocModeId | null {
-  const arg = argv.find((a) => a === "--mode" || a.startsWith("--mode="));
-  if (!arg) return null;
+  const index = argv.findIndex(
+    (a) => a === "--mode" || a.startsWith("--mode="),
+  );
+  if (index === -1) return null;
+  const arg = argv[index];
   const eq = arg.indexOf("=");
-  const value = eq === -1 ? null : arg.slice(eq + 1);
+  const value = eq === -1 ? argv[index + 1] : arg.slice(eq + 1);
   if (!value) return null;
   return isDocModeId(value) ? value : null;
 }
