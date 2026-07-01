@@ -1,0 +1,46 @@
+import { describe, expect, it, beforeAll, afterAll } from "vitest";
+import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { Workspace, WorkspaceBoundsError, listFilesRecursive } from "../src/workspace.js";
+
+describe("Workspace", () => {
+  let root: string;
+
+  beforeAll(async () => {
+    root = await mkdtemp(path.join(tmpdir(), "readme-assistant-"));
+    await mkdir(path.join(root, "src"));
+    await writeFile(path.join(root, "package.json"), "{}");
+    await writeFile(path.join(root, "src", "index.ts"), "export {}");
+  });
+
+  afterAll(async () => {
+    await rm(root, { recursive: true, force: true });
+  });
+
+  it("resolves paths inside the workspace", async () => {
+    const workspace = await Workspace.create(root);
+    expect(workspace.resolve("package.json")).toBe(path.join(root, "package.json"));
+    expect(workspace.resolve("src/index.ts")).toBe(path.join(root, "src", "index.ts"));
+  });
+
+  it("rejects paths that escape the workspace root", async () => {
+    const workspace = await Workspace.create(root);
+    expect(() => workspace.resolve("../../etc/passwd")).toThrow(WorkspaceBoundsError);
+    expect(() => workspace.resolve("/etc/passwd")).toThrow(WorkspaceBoundsError);
+  });
+
+  it("rejects a workspace root that is not a directory", async () => {
+    await expect(Workspace.create(path.join(root, "package.json"))).rejects.toThrow();
+  });
+
+  it("lists files recursively relative to the root, ignoring node_modules", async () => {
+    await mkdir(path.join(root, "node_modules"));
+    await writeFile(path.join(root, "node_modules", "ignored.js"), "");
+
+    const files = await listFilesRecursive(root, root);
+    expect(files).toContain("package.json");
+    expect(files).toContain(path.join("src", "index.ts"));
+    expect(files.some((f) => f.includes("node_modules"))).toBe(false);
+  });
+});
