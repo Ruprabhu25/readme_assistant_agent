@@ -1,0 +1,38 @@
+name: Release macOS binary
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build bundle + SEA blob
+        run: npm run build:bin
+
+      - name: Build macOS executable
+        run: npm run build:exe
+
+      - name: Package
+        run: |
+          cd dist-bin
+          zip readme_assistant-macos-${{ runner.arch }}.zip readme_assistant
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-bin/readme_assistant-macos-*.zip
