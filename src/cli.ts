@@ -7,8 +7,8 @@ import { createDebugLogger, parseDebugFlag, stripDebugFlag } from "./debug.js";
 import { renderDiff } from "./diff.js";
 import {
   DEFAULT_DOC_MODE,
-  describeModes,
   DOC_MODES,
+  describeModes,
   isDocModeId,
   parseModeFlag,
   stripModeFlag,

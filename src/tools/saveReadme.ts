@@ -26,10 +26,7 @@ export function makeSaveReadmeTool(
         .describe(
           "Target path relative to the workspace root — use the default filename for the current mode (e.g. API.md, CONTRIBUTING.md, QUICKSTART.md) unless the user asked for something else.",
         ),
-      content: z
-        .string()
-        .min(1)
-        .describe("Full document content to propose."),
+      content: z.string().min(1).describe("Full document content to propose."),
     }),
     execute: async ({ path: relPath, content }) => {
       workspace.resolve(relPath); // validate it's in-bounds without writing
