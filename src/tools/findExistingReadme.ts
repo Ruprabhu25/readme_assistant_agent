@@ -7,7 +7,8 @@ const CANDIDATES = ["README.md", "README", "Readme.md", "readme.md"];
 
 export function makeFindExistingReadmeTool(workspace: Workspace) {
   return tool({
-    description: "Check whether the workspace already has a README file and return its contents if so.",
+    description:
+      "Check whether the workspace already has a README file and return its contents if so.",
     inputSchema: z.object({}),
     execute: async () => {
       for (const candidate of CANDIDATES) {

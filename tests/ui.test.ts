@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { Readable, Writable } from "node:stream";
 import { createInterface } from "node:readline/promises";
+import { Readable, Writable } from "node:stream";
+import { describe, expect, it } from "vitest";
 import { askYesNo } from "../src/ui.js";
 
 function fakeTerminal() {

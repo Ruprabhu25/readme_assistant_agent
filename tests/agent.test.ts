@@ -1,12 +1,21 @@
-import { describe, expect, it } from "vitest";
 import { tool } from "ai";
-import { MockLanguageModelV4, convertArrayToReadableStream } from "ai/test";
+import { convertArrayToReadableStream, MockLanguageModelV4 } from "ai/test";
+import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { runAgentTurn, type ToolCallEvent, type ToolResultEvent } from "../src/agent.js";
+import {
+  runAgentTurn,
+  type ToolCallEvent,
+  type ToolResultEvent,
+} from "../src/agent.js";
 
 function usage() {
   return {
-    inputTokens: { total: 10, noCache: 10, cacheRead: undefined, cacheWrite: undefined },
+    inputTokens: {
+      total: 10,
+      noCache: 10,
+      cacheRead: undefined,
+      cacheWrite: undefined,
+    },
     outputTokens: { total: 5, text: 5, reasoning: undefined },
   };
 }
@@ -90,6 +99,11 @@ describe("runAgentTurn", () => {
     expect(first.map((m) => m.role)).toEqual(["user", "assistant"]);
 
     const second = await runAgentTurn(model, {}, first, "again");
-    expect(second.map((m) => m.role)).toEqual(["user", "assistant", "user", "assistant"]);
+    expect(second.map((m) => m.role)).toEqual([
+      "user",
+      "assistant",
+      "user",
+      "assistant",
+    ]);
   });
 });

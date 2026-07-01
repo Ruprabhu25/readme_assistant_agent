@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
-import path from "node:path";
 import { writeFile } from "node:fs/promises";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
 import { makeFindExistingReadmeTool } from "../../src/tools/findExistingReadme.js";
 import { toolCallOpts, useFixtures } from "./helpers.js";
 

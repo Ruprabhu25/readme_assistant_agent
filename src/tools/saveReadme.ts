@@ -12,12 +12,18 @@ export interface SaveReadmeProposal {
  * actual write happens in the CLI only after the user confirms. `onPropose` lets
  * the CLI capture the latest proposal for that confirm step.
  */
-export function makeSaveReadmeTool(workspace: Workspace, onPropose: (p: SaveReadmeProposal) => void) {
+export function makeSaveReadmeTool(
+  workspace: Workspace,
+  onPropose: (p: SaveReadmeProposal) => void,
+) {
   return tool({
     description:
       "Propose README content to save to the workspace. This does NOT write the file — it stages a proposal that the user must confirm before anything is written to disk.",
     inputSchema: z.object({
-      path: z.string().default("README.md").describe("Target path relative to the workspace root."),
+      path: z
+        .string()
+        .default("README.md")
+        .describe("Target path relative to the workspace root."),
       content: z.string().min(1).describe("Full README content to propose."),
     }),
     execute: async ({ path: relPath, content }) => {

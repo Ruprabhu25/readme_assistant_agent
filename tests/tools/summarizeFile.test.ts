@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
-import path from "node:path";
 import { writeFile } from "node:fs/promises";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
 import { makeSummarizeFileTool } from "../../src/tools/summarizeFile.js";
 import { WorkspaceBoundsError } from "../../src/workspace.js";
 import { toolCallOpts, useFixtures } from "./helpers.js";
@@ -20,7 +20,10 @@ describe("summarizeFile", () => {
   it("reports missing files without throwing", async () => {
     const { workspace } = await fixture();
     const tool = makeSummarizeFileTool(workspace);
-    const result = await tool.execute!({ path: "does-not-exist.ts" }, toolCallOpts);
+    const result = await tool.execute!(
+      { path: "does-not-exist.ts" },
+      toolCallOpts,
+    );
     expect(result.error).toBe("File not found");
   });
 
@@ -40,8 +43,8 @@ describe("summarizeFile", () => {
   it("rejects a path that escapes the workspace", async () => {
     const { workspace } = await fixture();
     const tool = makeSummarizeFileTool(workspace);
-    await expect(tool.execute!({ path: "../../etc/passwd" }, toolCallOpts)).rejects.toThrow(
-      WorkspaceBoundsError,
-    );
+    await expect(
+      tool.execute!({ path: "../../etc/passwd" }, toolCallOpts),
+    ).rejects.toThrow(WorkspaceBoundsError);
   });
 });

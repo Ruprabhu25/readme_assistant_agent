@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 import { promises as fs } from "node:fs";
-import type { ModelMessage } from "ai";
-import { loadModel } from "./config.js";
-import { Workspace } from "./workspace.js";
-import { buildTools, type SaveReadmeProposal } from "./tools/index.js";
+import type { LanguageModel, ModelMessage } from "ai";
 import { runAgentTurn } from "./agent.js";
+import { loadModel } from "./config.js";
 import { createDebugLogger, parseDebugFlag, stripDebugFlag } from "./debug.js";
-import { loadHistory, parseHistoryFlag, saveHistory, stripHistoryFlag } from "./history.js";
 import { renderDiff } from "./diff.js";
+import {
+  loadHistory,
+  parseHistoryFlag,
+  saveHistory,
+  stripHistoryFlag,
+} from "./history.js";
+import { buildTools, type SaveReadmeProposal } from "./tools/index.js";
 import {
   askYesNo,
   createPromptInterface,
@@ -18,9 +22,13 @@ import {
   printTextDelta,
   printToolCall,
   printToolResult,
+  startThinkingIndicator,
 } from "./ui.js";
+import { Workspace } from "./workspace.js";
 
-function readProposal(holder: { current: SaveReadmeProposal | null }): SaveReadmeProposal | null {
+function readProposal(holder: {
+  current: SaveReadmeProposal | null;
+}): SaveReadmeProposal | null {
   return holder.current;
 }
 
@@ -32,7 +40,7 @@ async function main(): Promise<void> {
   const workspaceArg = positionalArgs[0] ?? ".";
   const debug = createDebugLogger(debugLogPath);
 
-  let model;
+  let model: LanguageModel;
   try {
     model = loadModel();
   } catch (err) {
@@ -50,34 +58,52 @@ async function main(): Promise<void> {
     return;
   }
 
-  const proposalHolder: { current: SaveReadmeProposal | null } = { current: null };
+  const proposalHolder: { current: SaveReadmeProposal | null } = {
+    current: null,
+  };
   const tools = buildTools(workspace, (proposal) => {
     proposalHolder.current = proposal;
   });
 
   printSystem(`README Assistant — workspace: ${workspace.root}`);
-  if (debugLogPath) printSystem(`Debug logging enabled — writing to ${debugLogPath}`);
-  if (historyPath) printSystem(`Chat history enabled — persisting to ${historyPath}`);
+  if (debugLogPath)
+    printSystem(`Debug logging enabled — writing to ${debugLogPath}`);
+  if (historyPath)
+    printSystem(`Chat history enabled — persisting to ${historyPath}`);
   printSystem('Type a message, or "exit" to quit.\n');
 
   const rl = createPromptInterface();
-  let history: ModelMessage[] = historyPath ? await loadHistory(historyPath) : [];
+  let history: ModelMessage[] = historyPath
+    ? await loadHistory(historyPath)
+    : [];
 
   try {
-    debug.log("chat-start", "")
+    debug.log("chat-start", "");
     while (true) {
       const input = (await rl.question("you> ")).trim();
       if (!input) continue;
       if (/^(exit|quit)$/i.test(input)) break;
 
       proposalHolder.current = null;
-      printAssistantPrefix();
       debug.log("user-input", input);
+
+      const stopThinking = startThinkingIndicator();
+      let prefixPrinted = false;
+      const ensurePrefix = () => {
+        if (prefixPrinted) return;
+        prefixPrinted = true;
+        stopThinking();
+        printAssistantPrefix();
+      };
 
       try {
         history = await runAgentTurn(model, tools, history, input, {
-          onTextDelta: printTextDelta,
+          onTextDelta: (delta) => {
+            ensurePrefix();
+            printTextDelta(delta);
+          },
           onToolCall: (e) => {
+            ensurePrefix();
             printToolCall(e.toolName, e.input);
             debug.log("tool-call", e);
           },
@@ -87,12 +113,15 @@ async function main(): Promise<void> {
           },
         });
       } catch (err) {
+        stopThinking();
         printNewline();
         const message = err instanceof Error ? err.message : String(err);
         printError(message);
         debug.log("error", message);
         continue;
       }
+      stopThinking();
+      ensurePrefix();
 
       if (historyPath) await saveHistory(historyPath, history);
 
@@ -103,12 +132,18 @@ async function main(): Promise<void> {
         const abs = workspace.resolve(proposal.path);
         const existing = await fs.readFile(abs, "utf8").catch(() => "");
 
-        const wantsDiff = await askYesNo(rl, `Show a diff of the proposed changes to "${proposal.path}"?`);
+        const wantsDiff = await askYesNo(
+          rl,
+          `Show a diff of the proposed changes to "${proposal.path}"?`,
+        );
         if (wantsDiff) {
           printSystem(renderDiff(existing, proposal.content));
         }
 
-        const accept = await askYesNo(rl, `Accept these changes and save to "${proposal.path}"?`);
+        const accept = await askYesNo(
+          rl,
+          `Accept these changes and save to "${proposal.path}"?`,
+        );
         if (accept) {
           await fs.writeFile(abs, proposal.content, "utf8");
           printSystem(`Saved ${proposal.path}`);
@@ -123,6 +158,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  printError(err instanceof Error ? err.stack ?? err.message : String(err));
+  printError(err instanceof Error ? (err.stack ?? err.message) : String(err));
   process.exitCode = 1;
 });

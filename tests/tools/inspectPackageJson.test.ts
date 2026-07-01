@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
-import path from "node:path";
 import { rm, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
 import { makeInspectPackageJsonTool } from "../../src/tools/inspectPackageJson.js";
 import { toolCallOpts, useFixtures } from "./helpers.js";
 
@@ -39,7 +39,10 @@ describe("inspectPackageJson", () => {
 
   it("defaults dependencies to an empty list when absent", async () => {
     const { workspace, root } = await fixture();
-    await writeFile(path.join(root, "package.json"), JSON.stringify({ name: "no-deps" }));
+    await writeFile(
+      path.join(root, "package.json"),
+      JSON.stringify({ name: "no-deps" }),
+    );
     const tool = makeInspectPackageJsonTool(workspace);
     const result = await tool.execute!({}, toolCallOpts);
     expect(result.found).toBe(true);

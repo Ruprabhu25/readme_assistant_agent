@@ -1,0 +1,14 @@
+- allow readmes to be any file? or specified file given by user
+    - enhancement: users may want to store info in multiple markdown files
+    - ex. deploy, model, general readme, lifecycle, etc.
+- github actions CI:
+    - linting, building, vuln check, etc.
+    - how does current company handle CI/CD?
+- history
+    - currently saved to a single file, running chat with history loads entire history into context
+    - no support if we want to scale / support multiple users
+    - enhancement: summarization when user runs tool with --history
+    - enhancement: support multiple sessions (ex. user has multiple repos / wants to separate enhancements into different chat histories)
+        - prevents bloat of context + token wastage
+    - 
+

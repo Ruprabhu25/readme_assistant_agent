@@ -1,4 +1,10 @@
-import { streamText, stepCountIs, type LanguageModel, type ModelMessage, type ToolSet } from "ai";
+import {
+  type LanguageModel,
+  type ModelMessage,
+  stepCountIs,
+  streamText,
+  type ToolSet,
+} from "ai";
 
 const SYSTEM_PROMPT = `You are a README Assistant. You help a user understand a local project workspace and draft or improve its documentation.
 
@@ -41,7 +47,10 @@ export async function runAgentTurn(
   userInput: string,
   callbacks: AgentTurnCallbacks = {},
 ): Promise<ModelMessage[]> {
-  const messages: ModelMessage[] = [...history, { role: "user", content: userInput }];
+  const messages: ModelMessage[] = [
+    ...history,
+    { role: "user", content: userInput },
+  ];
 
   const result = streamText({
     model,
@@ -60,7 +69,10 @@ export async function runAgentTurn(
         callbacks.onToolCall?.({ toolName: part.toolName, input: part.input });
         break;
       case "tool-result":
-        callbacks.onToolResult?.({ toolName: part.toolName, output: part.output });
+        callbacks.onToolResult?.({
+          toolName: part.toolName,
+          output: part.output,
+        });
         break;
       default:
         break;

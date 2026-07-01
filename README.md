@@ -1,19 +1,71 @@
 # Telcor AI Assistant
 
-## Overview
+`telcor_ai_assistant` is a README Assistant CLI agent built with the Vercel AI SDK. It helps users generate and manage README files within their project workspace.
 
-Telcor AI Assistant is a CLI agent built with the Vercel AI SDK. It provides an interactive environment to assist users in generating and managing README files for projects.
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Features](#features)
+- [Directory Structure](#directory-structure)
+- [Configuration](#configuration)
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone <repository-url>
+   cd telcor_ai_assistant
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file from the example and set your OpenAI API key:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Add your OpenAI API key to the `.env` file:
+
+   ```plaintext
+   OPENAI_API_KEY=your_api_key_here
+   ```
+
+## Usage
+
+Run the CLI tool with the following command:
+
+```bash
+npm run start
+```
+
+You can pass additional arguments for debugging and history:
+
+- `--debug <path>`: Saves debug information to a specified file.
+- `--history <path>`: Saves chat history to a specified file.
+
+The prompt will allow you to generate and propose changes to README files. Accept or reject changes interactively.
 
 ## Features
 
-- **Interactive Command Line Interface**: Engage in a conversation with the assistant to generate README content.
-- **Environment Configuration**: Load environment settings from a `.env` file, ensuring necessary API keys are provided. The primary expected variable is `OPENAI_API_KEY`.
-- **File Management**: Proposals for README content can be confirmed and saved directly to specified paths.
-- **Workspace Context Usage**: The assistant can inspect files in the workspace, providing tailored responses and suggestions based on the project's actual structure and content.
+- GPT-4 powered interactive assistant for README generation.
+- Diff view of proposed changes to track modifications.
+- Chat history feature to persist conversations.
+- Debug logging for troubleshooting.
 
-## Project Structure
+## Directory Structure
 
-```
+```plaintext
+.
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── scripts/
 │   ├── build-bin.mjs
 │   └── make-exe.mjs
@@ -30,6 +82,9 @@ Telcor AI Assistant is a CLI agent built with the Vercel AI SDK. It provides an 
 │   ├── agent.ts
 │   ├── cli.ts
 │   ├── config.ts
+│   ├── debug.ts
+│   ├── diff.ts
+│   ├── history.ts
 │   ├── ui.ts
 │   └── workspace.ts
 ├── tests/
@@ -44,10 +99,14 @@ Telcor AI Assistant is a CLI agent built with the Vercel AI SDK. It provides an 
 │   │   └── summarizeFile.test.ts
 │   ├── agent.test.ts
 │   ├── fixtures.ts
+│   ├── ui.test.ts
 │   └── workspace.test.ts
 ├── .env.example
 ├── .gitignore
-├── notes.md
+├── biome.json
+├── debug.log
+├── enhancements.md
+├── history.json
 ├── package-lock.json
 ├── package.json
 ├── project.md
@@ -56,83 +115,8 @@ Telcor AI Assistant is a CLI agent built with the Vercel AI SDK. It provides an 
 └── vitest.config.ts
 ```
 
-### Directory Explanations
+## Configuration
 
-- `scripts/`: Contains scripts for building the project and creating executable binaries.
-- `src/`: Source code for the assistant, divided into various tools and main application files.
-- `tests/`: Unit tests for the assistant's functionality, organized similarly to the source code for easy maintenance.
+Ensure the following environment variable is set in your `.env` file:
 
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone <repository_url>
-   cd telcor_ai_assistant
-   ```
-
-2. Install the dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Setup your environment by copying the example file and adding your OpenAI API key:
-   ```bash
-   cp .env.example .env
-   # Add your OPENAI_API_KEY to the .env file
-   ```
-
-## Usage
-
-To start the assistant, run the following command in your terminal:
-
-```bash
-npm start
-```
-
-Once the assistant is running, you can interact with it directly in the CLI. Here’s what you can do:
-
-1. **Type your prompt**: The assistant will respond with a proposed README content based on your input.
-   
-   For example:
-   ```plaintext
-   you> Generate a README for a project that manages tasks.
-   ```
-
-2. **Review the proposal**: After processing your input, the assistant will display the proposed content.
-
-3. **Saving the proposal**: If you are satisfied with the proposed README, the assistant will ask you to confirm saving it:
-   ```plaintext
-   Save proposed README to "README.md"? (yes/no)
-   ```
-
-   Type `yes` to save the content to the specified path or `no` to discard it.
-
-4. **Exiting the assistant**: Type `exit` or `quit` if you want to terminate the session.
-
-This interactive dialogue makes it easy to generate README files tailored to your project's needs.
-
-## Testing
-
-To run the tests, use:
-
-```bash
-npm test
-```
-
-The testing framework used is [Vitest](https://vitest.dev/), which enables rapid testing of the assistant's functionality. Tests are located in the `tests/` directory, which includes unit tests for the various tools used in the assistant:
-
-```
-└── tests/
-    ├── tools/
-    │   ├── findExistingReadme.test.ts
-    │   ├── inspectPackageJson.test.ts
-    │   ├── listFiles.test.ts
-    │   ├── readFile.test.ts
-    │   ├── saveReadme.test.ts
-    │   ├── searchFiles.test.ts
-    │   └── summarizeFile.test.ts
-    ├── agent.test.ts
-    └── workspace.test.ts
-```
-
-These tests ensure that the assistant functions correctly and robustly when handling various project scenarios.
+- `OPENAI_API_KEY`: Your OpenAI API key for accessing the AI models.

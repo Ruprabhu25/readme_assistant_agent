@@ -23,6 +23,9 @@ export async function loadHistory(filePath: string): Promise<ModelMessage[]> {
   }
 }
 
-export async function saveHistory(filePath: string, history: ModelMessage[]): Promise<void> {
+export async function saveHistory(
+  filePath: string,
+  history: ModelMessage[],
+): Promise<void> {
   await fs.writeFile(filePath, JSON.stringify(history, null, 2), "utf8");
 }

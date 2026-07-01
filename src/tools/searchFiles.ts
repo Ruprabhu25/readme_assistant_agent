@@ -9,7 +9,8 @@ const MAX_FILE_BYTES = 1_000_000;
 
 export function makeSearchFilesTool(workspace: Workspace) {
   return tool({
-    description: "Search file contents in the workspace for a plain-text substring, case-insensitive.",
+    description:
+      "Search file contents in the workspace for a plain-text substring, case-insensitive.",
     inputSchema: z.object({
       query: z.string().min(1).describe("Substring to search for."),
       dir: z.string().default(".").describe("Subdirectory to search within."),

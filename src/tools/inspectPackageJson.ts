@@ -26,7 +26,10 @@ export function makeInspectPackageJsonTool(workspace: Workspace) {
           devDependencies: Object.keys(pkg.devDependencies ?? {}),
         };
       } catch {
-        return { found: true as const, error: "package.json is not valid JSON" };
+        return {
+          found: true as const,
+          error: "package.json is not valid JSON",
+        };
       }
     },
   });

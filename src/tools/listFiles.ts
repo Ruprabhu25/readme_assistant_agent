@@ -13,7 +13,9 @@ export function makeListFilesTool(workspace: Workspace) {
       dir: z
         .string()
         .default(".")
-        .describe("Subdirectory to list, relative to the workspace root. Defaults to the root."),
+        .describe(
+          "Subdirectory to list, relative to the workspace root. Defaults to the root.",
+        ),
     }),
     execute: async ({ dir }) => {
       const abs = workspace.resolve(dir);

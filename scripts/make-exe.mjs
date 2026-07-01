@@ -1,10 +1,11 @@
-import { copyFile, chmod, mkdir } from "node:fs/promises";
 import { execFile } from "node:child_process";
+import { chmod, copyFile, mkdir } from "node:fs/promises";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
-const outName = process.platform === "win32" ? "readme_assistant.exe" : "readme_assistant";
+const outName =
+  process.platform === "win32" ? "readme_assistant.exe" : "readme_assistant";
 const outPath = `dist-bin/${outName}`;
 
 await mkdir("dist-bin", { recursive: true });
@@ -33,7 +34,9 @@ await execFileAsync("npx", [
   "dist-bin/sea-prep.blob",
   "--sentinel-fuse",
   "NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2",
-  ...(process.platform === "darwin" ? ["--macho-segment-name", "NODE_SEA"] : []),
+  ...(process.platform === "darwin"
+    ? ["--macho-segment-name", "NODE_SEA"]
+    : []),
 ]);
 
 if (process.platform === "darwin") {

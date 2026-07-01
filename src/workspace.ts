@@ -52,7 +52,9 @@ const DEFAULT_IGNORES = new Set([
 
 /** Matches .env and .env.* (e.g. .env.local), but not .env.example. */
 function isEnvFile(name: string): boolean {
-  return name !== ".env.example" && (name === ".env" || name.startsWith(".env."));
+  return (
+    name !== ".env.example" && (name === ".env" || name.startsWith(".env."))
+  );
 }
 
 /** Recursively lists files under `dirAbs`, returning paths relative to `root`. */
@@ -104,10 +106,12 @@ export function formatFileTree(paths: string[]): string {
   }
 
   function sortedEntries(node: TreeNode): [string, TreeNode][] {
-    return [...node.children.entries()].sort(([aName, aNode], [bName, bNode]) => {
-      if (aNode.isFile !== bNode.isFile) return aNode.isFile ? 1 : -1;
-      return aName.localeCompare(bName);
-    });
+    return [...node.children.entries()].sort(
+      ([aName, aNode], [bName, bNode]) => {
+        if (aNode.isFile !== bNode.isFile) return aNode.isFile ? 1 : -1;
+        return aName.localeCompare(bName);
+      },
+    );
   }
 
   const lines: string[] = [];

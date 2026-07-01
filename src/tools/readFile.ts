@@ -7,7 +7,8 @@ const MAX_CHARS = 20_000;
 
 export function makeReadFileTool(workspace: Workspace) {
   return tool({
-    description: "Read the contents of a single file in the workspace, truncated if very large.",
+    description:
+      "Read the contents of a single file in the workspace, truncated if very large.",
     inputSchema: z.object({
       path: z.string().describe("File path relative to the workspace root."),
     }),

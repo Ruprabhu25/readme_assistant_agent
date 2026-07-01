@@ -1,7 +1,10 @@
-import { describe, expect, it } from "vitest";
-import path from "node:path";
 import { readFile } from "node:fs/promises";
-import { makeSaveReadmeTool, type SaveReadmeProposal } from "../../src/tools/saveReadme.js";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+import {
+  makeSaveReadmeTool,
+  type SaveReadmeProposal,
+} from "../../src/tools/saveReadme.js";
 import { WorkspaceBoundsError } from "../../src/workspace.js";
 import { toolCallOpts, useFixtures } from "./helpers.js";
 
@@ -14,7 +17,10 @@ describe("saveReadme", () => {
     const tool = makeSaveReadmeTool(workspace, (p) => {
       staged = p;
     });
-    const result = await tool.execute!({ path: "README.md", content: "# Draft" }, toolCallOpts);
+    const result = await tool.execute!(
+      { path: "README.md", content: "# Draft" },
+      toolCallOpts,
+    );
     expect(result.staged).toBe(true);
     expect(staged).toEqual({ path: "README.md", content: "# Draft" });
     await expect(readFile(path.join(root, "README.md"))).rejects.toThrow();
@@ -23,7 +29,10 @@ describe("saveReadme", () => {
   it("reports the character count of the staged content", async () => {
     const { workspace } = await fixture();
     const tool = makeSaveReadmeTool(workspace, () => {});
-    const result = await tool.execute!({ path: "README.md", content: "hello" }, toolCallOpts);
+    const result = await tool.execute!(
+      { path: "README.md", content: "hello" },
+      toolCallOpts,
+    );
     expect(result.chars).toBe(5);
   });
 

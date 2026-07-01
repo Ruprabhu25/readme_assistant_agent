@@ -1,8 +1,13 @@
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
-import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { Workspace, WorkspaceBoundsError, formatFileTree, listFilesRecursive } from "../src/workspace.js";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  formatFileTree,
+  listFilesRecursive,
+  Workspace,
+  WorkspaceBoundsError,
+} from "../src/workspace.js";
 
 describe("Workspace", () => {
   let root: string;
@@ -20,18 +25,28 @@ describe("Workspace", () => {
 
   it("resolves paths inside the workspace", async () => {
     const workspace = await Workspace.create(root);
-    expect(workspace.resolve("package.json")).toBe(path.join(root, "package.json"));
-    expect(workspace.resolve("src/index.ts")).toBe(path.join(root, "src", "index.ts"));
+    expect(workspace.resolve("package.json")).toBe(
+      path.join(root, "package.json"),
+    );
+    expect(workspace.resolve("src/index.ts")).toBe(
+      path.join(root, "src", "index.ts"),
+    );
   });
 
   it("rejects paths that escape the workspace root", async () => {
     const workspace = await Workspace.create(root);
-    expect(() => workspace.resolve("../../etc/passwd")).toThrow(WorkspaceBoundsError);
-    expect(() => workspace.resolve("/etc/passwd")).toThrow(WorkspaceBoundsError);
+    expect(() => workspace.resolve("../../etc/passwd")).toThrow(
+      WorkspaceBoundsError,
+    );
+    expect(() => workspace.resolve("/etc/passwd")).toThrow(
+      WorkspaceBoundsError,
+    );
   });
 
   it("rejects a workspace root that is not a directory", async () => {
-    await expect(Workspace.create(path.join(root, "package.json"))).rejects.toThrow();
+    await expect(
+      Workspace.create(path.join(root, "package.json")),
+    ).rejects.toThrow();
   });
 
   it("lists files recursively relative to the root, ignoring node_modules", async () => {
@@ -64,8 +79,19 @@ describe("Workspace", () => {
 
 describe("formatFileTree", () => {
   it("nests files under their parent directories, dirs before files", () => {
-    const tree = formatFileTree(["package.json", path.join("src", "index.ts"), path.join("src", "util.ts")]);
-    expect(tree).toBe(["├── src/", "│   ├── index.ts", "│   └── util.ts", "└── package.json"].join("\n"));
+    const tree = formatFileTree([
+      "package.json",
+      path.join("src", "index.ts"),
+      path.join("src", "util.ts"),
+    ]);
+    expect(tree).toBe(
+      [
+        "├── src/",
+        "│   ├── index.ts",
+        "│   └── util.ts",
+        "└── package.json",
+      ].join("\n"),
+    );
   });
 
   it("includes every path exactly once, even for deeply nested siblings", () => {
